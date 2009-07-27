@@ -1,0 +1,7 @@
+A bunch of stuff that I normally like to have around, or that it isn't normal 
+for me to have, but which I thought others would find useful.
+---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|
+bin/
+  TopLJPostPackager.py       - Used at jrbl.org to query my LiveJournal, gather up the most recent public posts, and 
+                               stick their permalinks into a file for server-side inclusion.  With minor enhancement,
+                               could be used to repackage any RSS or Atom feed.
