@@ -47,7 +47,7 @@ if __name__ == "__main__":
         if pair[0] == '-f': ofile = pair[1][1:]
 
     count = 0
-    url   = "http://" + user + ".livejournal.com/data/rss"
+    url   = "http://" + user + ".livejournal.com/data/atom"
     #out   = open(ofile, 'w')
     out   = tempfile.NamedTemporaryFile('w', prefix='ljpost_', dir='.', delete=False)
     oline = "<h2 id=\"blog\">Recent Blog Posts</h2>\n <ul>\n"
