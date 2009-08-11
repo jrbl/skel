@@ -1,0 +1,74 @@
+#   This is my personal .screenrc
+#
+#   Commands in this file are used to set options, bind screen functions to
+#   keys, redefine terminal capabilities, and to automatically establish one or
+#   more windows at the beginning of your screen session.
+#
+
+# ------------------------------------------------------------------------------
+# SCREEN SETTINGS
+# ------------------------------------------------------------------------------
+
+startup_message off
+deflogin on
+vbell off
+defscrollback 2048
+shell /bin/bash
+
+# ------------------------------------------------------------------------------
+# SCREEN KEYBINDINGS
+# ------------------------------------------------------------------------------
+
+# Remove bindings for xon/xoff; I never use them anyway
+bind '^S'
+bind '^Q'
+bind 's'
+bind 'q'
+
+#bind 'R' colon "screen -ln rlogin faui -8^b^b^b"
+bind 'P' colon "^p"
+
+# An example of a "screen scraper" which will launch urlview on the current
+# screen window
+#
+#bind ^B eval "hardcopy_append off" "hardcopy -h $HOME/.screen-urlview" "screen urlview $HOME/.screen-urlview"
+
+# on Debian backspace should send char `\177':
+bindkey -k kb stuff "\177"
+
+# ------------------------------------------------------------------------------
+# TERMINAL SETTINGS
+# ------------------------------------------------------------------------------
+
+# The vt100 description does not mention "dl". *sigh*
+termcapinfo vt100 dl=5\E[M
+
+# ------------------------------------------------------------------------------
+# STARTUP SCREENS
+# ------------------------------------------------------------------------------
+
+# Example of automatically running some programs in windows on screen startup.
+#
+#   The following will open top in the first window, an ssh session to monkey
+#   in the next window, and then open mutt and tail in windows 8 and 9
+#   respectively.
+#
+# screen top
+# screen -t monkey ssh monkey
+# screen -t mail 8 mutt
+# screen -t daemon 9 tail -f /var/log/daemon.log
+
+# ------------------------------------------------------------------------------
+# SCREEN SHARING
+# ------------------------------------------------------------------------------
+# This must be turned on to share screens
+##multiuser on
+# tell it root exists and can run these commands
+# unfortunately +r-w "#" doesn't work here because "#" means all existing
+# windows, and in .screenrc, there are no existing windows
+##aclchg root +x "detach,help"
+# but you need to do this interactively to make existing screen windows
+# -w
+##aclchg root -w "#"
+# new windows get +r -w for new root users
+##aclumask root+r root-w
