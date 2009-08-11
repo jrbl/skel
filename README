@@ -5,3 +5,8 @@ bin/
   TopLJPostPackager.py       - Used at jrbl.org to query my LiveJournal, gather up the most recent public posts, and 
                                stick their permalinks into a file for server-side inclusion.  With minor enhancement,
                                could be used to repackage any RSS or Atom feed.
+
+  BaseChanger.py             - converts integers into string representations in arbitrary bases, and arbitrarily-based
+                               strings (encoding numeric values) into regular integers.  Has convenience features for 
+                               bases up to base-66, which is the highest base that can be supported in standard URLs.
+                               Used whenever I need to generate locally unique identifiers.
