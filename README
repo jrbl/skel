@@ -10,3 +10,18 @@ bin/
                                strings (encoding numeric values) into regular integers.  Has convenience features for 
                                bases up to base-66, which is the highest base that can be supported in standard URLs.
                                Used whenever I need to generate locally unique identifiers.
+
+Dotfiles: note these have been renamed; move to your home directory and remove the leading _ to install.
+  _.bash_logout              - clears screen on logout
+  _.bash_profile             - adjusts path and manpath and friends for /usr/local and ~/.user/
+  _.bashrc                   - mostly just has colorful, wonderful prompts
+
+  _.screenrc                 - contains comments explaining how to do screen sharing.  sort of.
+
+  _.vimrc                    - Possibly the most important thing in skel
+  _.vim/
+    plugin/
+      *                      - locally installed vim plugins
+    templates/
+      *                      - various templates for use with Aristotle Pagaltiz's vim templates system
+                               You have no idea how much I type :set ft=py
