@@ -23,6 +23,7 @@ set title              " display vim info in window titlebar (in x)
 set icon               " display a mini-icon in our window (in x)
 set equalalways        " keep multiple buffers the same size
 set ead=both           " same size horiz. and vert.
+set nu                 " line numbering
 
 " Editing
 set hid                " When we open a new file, keep old ones around
@@ -98,14 +99,17 @@ autocmd BufRead  pico*[0-9]             set nocindent
 autocmd BufRead  mutt*[0-9]             set ignorecase
 
 " Text files have a text width of 78 characters
+""":set wrap linebreak textwidth=0
 autocmd BufNewFile *.txt                set tw=78 noai nocindent 
 autocmd BufRead    *.txt                set tw=78 noai nocindent 
 
 " Tex files are like text files, but for tex
+""":set wrap linebreak textwidth=0
 autocmd BufNewFile *.tex                set tw=78 noai nocindent 
 autocmd BufRead    *.tex                set tw=78 noai nocindent 
 
 " Free Writing Exercises are mostly, but not entirely, like text files
+""":set wrap linebreak textwidth=0
 autocmd BufNewFile *.fwe     set tw=78 noai nocindent 
 autocmd BufRead    *.fwe     set tw=78 noai nocindent 
 autocmd BufRead    *.fwe     G
@@ -114,8 +118,8 @@ autocmd BufRead    *.fwe     G
 autocmd BufNewFile svn-commit.tmp       set tw=78 nocindent noai
 
 " Automatically chmod +x Shell, Perl, and Python scripts
-autocmd BufWritePost   *.sh             !chmod 700 %
-autocmd BufWritePost   *.pl             !chmod 700 %
-autocmd BufWritePost   *.plx            !chmod 700 %
-autocmd BufWritePost   *.py             !chmod 700 %
+autocmd BufWritePost   *.sh             !chmod u+x %
+autocmd BufWritePost   *.pl             !chmod u+x %
+autocmd BufWritePost   *.plx            !chmod u+x %
+autocmd BufWritePost   *.py             !chmod u+x %
 
