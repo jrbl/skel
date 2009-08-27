@@ -7,66 +7,67 @@
 import feedparser
 import sys
 import posix
-import getopt
+import optparse
 import tempfile
+from datetime import datetime
 
 
-def helpAndExit():
-    print sys.argv[0] + """ - Gets some LJ posts and outputs structured permalink list.
+def getDebugFunc(flag):
+    def _true(message, terminated):
+        sys.stderr.write(unicode(datetime.now()) + ' ' + message )
+        if not terminated: sys.stderr.write('\n')
+        sys.stderr.flush()
+    def _false(ignored, alsoignored):
+        pass
+    if flag: return _true
+    else: return _false
 
-Options:
--h        This help.
--d        Debug flag; makes this program chatty.
--n=<N>    Gets <N> most recent public LJ posts.  Defaults to 9.
--u=<USER> Updates from http://<USER>.livejournal.com.  Defaults to jrbl.
--f=<FILE> Outputs to <FILE>.  Defaults to ~jrbl/public_html/lj-shorts.incl.
--c        Copyright information (FIXME)
-"""
-    sys.exit()
-
-
-def copyrightAndExit():
-    print "ERROR: Not yet implemented."
-    sys.exit()
-
+def postGenerator(url, max, strp_string):
+    count = 0
+    for post in feedparser.parse(url).entries:
+        if count == max: break
+        yield datetime.strptime(post.updated), post.title, post.link
+        count += 1
 
 if __name__ == "__main__":
 
-    DEBUG = False
-    N     = 9
-    user  = 'jrbl'
-    ofile = "/home/jrbl/public_html/lj-shorts.incl"
+    parser = optparse.OptionParser(usage = "%prog [options] [-o outfile]")
+    parser.add_option('-d', '--debug', dest="debug_flag", action="store_true", default=False,
+                      help="Enable debug output.  Defaults to off")
+    parser.add_option('-n', '--number', dest="number", action="store", metavar="N", default=9,
+                      help="Get N most recent public LJ posts.  Defaults to 9")
+    parser.add_option('-u', '--user', dest="user", action="store", metavar="USER", default='jrbl',
+                      help="Updates from http://USER.livejournal.com.  Defaults to jrbl")
+    parser.add_option('-o', '--outfile', dest="outfile", action="store", metavar="FILE",
+                      help="Output to FILE.  No default value")
+    options, args = parser.parse_args()
 
-    pairs, remainder = getopt.getopt(sys.argv[1:], 'hdcn:u:f:')
-    for pair in pairs:
-        if pair[0] == '-h': helpAndExit()
-        if pair[0] == '-c': copyrightAndExit()
-        if pair[0] == '-d': DEBUG = True
-        if pair[0] == '-n': N     = int(pair[1][1:])
-        if pair[0] == '-u': user  = pair[1][1:]
-        if pair[0] == '-f': ofile = pair[1][1:]
+    if (len(sys.argv) == 0) or (not options.outfile):
+        parser.print_help()
+        sys.exit()
+    debug = getDebugFunc(options.debug_flag)
 
     count = 0
-    url   = "http://" + user + ".livejournal.com/data/atom"
-    #out   = open(ofile, 'w')
+    url   = "http://" + options.user + ".livejournal.com/data/atom"
     out   = tempfile.NamedTemporaryFile('w', prefix='ljpost_', dir='.', delete=False)
     oline = "<h2 id=\"blog\">Recent Blog Posts</h2>\n <ul>\n"
-    if DEBUG: print oline,
+    debug(oline, True)
     out.write(oline)
+
     for post in feedparser.parse(url).entries:
-        if count == N: break
+        if count == options.number: break
         oline  =  "  <li><a href=\"" + post.link + "\">" 
         oline  += post.title + "</a>: "
         oline  += post.updated + "</li>\n"
-        if DEBUG: print oline,
+        debug(oline, True)
         out.write(oline)
         count  += 1
 
     oline = " </ul>\n"
-    if DEBUG: print oline,
+    debug(oline, True)
     out.write(oline)
 
     outname = out.name
     out.close()
     posix.chmod(outname, 0644)
-    posix.rename(outname, ofile)
+    posix.rename(outname, options.outfile)
