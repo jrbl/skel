@@ -43,7 +43,7 @@ def postGenerator(url, max, strp_string):
     for post in feedparser.parse(url).entries:
         if count == max: break
         count += 1
-        dt = datetime.strptime(post.updated[0:19], strp_string)
+        dt = datetime.strptime(post.published[0:19], strp_string)
         yield dt, post.title, post.link
 
 def lotsaParsers(options):
