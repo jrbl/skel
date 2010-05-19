@@ -6,11 +6,20 @@
 
 import feedparser
 import sys
-import posix
+import codecs
 import optparse
-import tempfile
 from datetime import datetime
 
+
+FEEDS = [
+         #    URL                                    Label            Link it?
+         ("http://USER.livejournal.com/data/atom", "Blogging",        True), 
+         ("http://github.com/USER.atom",           "Developing",      True), 
+         ("https://identi.ca/api/statuses/user_timeline/USER.atom", 
+                                                   "Tweeting",        False),
+         ("http://api.flickr.com/services/feeds/photos_public.gne?id=17873302@N00&lang=en-us&format=atom",
+                                                   "Photography",     True),
+        ]
 
 def configOptParse():
     parser = optparse.OptionParser(usage = "%prog [options] [-o outfile]")
@@ -38,33 +47,51 @@ def getDebugFunc(flag):
     if flag: return _true
     else: return _false
 
-def postGenerator(url, max, strp_string):
-    count = 0
+def postGenerator(url, max, filter = lambda x: x): 
+    count = 0 
+    date = ''
     for post in feedparser.parse(url).entries:
         if count == max: break
-        count += 1
-        dt = datetime.strptime(post.published[0:19], strp_string)
-        yield dt, post.title, post.link
+        if filter(post.title):
+            count += 1
+            try:
+                date = post.published[:19]
+            except AttributeError:
+                date = "%d-%02d-%02d %02d:%02d" % post.updated_parsed[0:5]
+            try:
+                title = post.title.decode('utf-8')
+            except UnicodeEncodeError:
+                title = post.title
+            yield date, title, post.link
 
-def lotsaParsers(options):
-    feeds = [
-             "http://USER.livejournal.com/data/atom", 
-             "http://github.com/USER.atom",
-             "https://identi.ca/api/statuses/user_timeline/USER.atom",
-            ]
-    posts = []
-    for feed in feeds:
-        gen = postGenerator(feed.replace('USER', options.user), 
-                            options.number, "%Y-%m-%dT%H:%M:%S")
-        posts.extend([x for x in gen])
-    posts.sort(reverse=True)
-    return posts[:options.number]
-
-def outputGenerator(header, input):
-    yield "<h2 id=\"blog\">%s</h2>\n <ul>\n" % header
+def outputGenerator(header, input, linkit=True):
+    yield "<h3 class=\"blog\">%s</h3>\n <ul class=\"activity\">\n" % header
     for date, title, link in input:
-        yield "<li><a href=\"%s\">%s</a>: %s\n" % (link, title, unicode(date))
+        if linkit:
+            yield "<li><a href=\"%s\">%s</a>: <span style=\"font-size:x-small;\">%s</span></li>\n" % (link, title, unicode(date))
+        else:
+            yield "<li>%s: <span style=\"font-size:x-small;\">%s</span></li>\n" % (heat_links(title), unicode(date))
     yield " </ul>\n"
+
+def heat_links(title):
+    toks = title.split()
+    ret_toks = []
+    for tok in toks:
+        if tok.startswith("http://") or tok.startswith("https://"):
+            ret_toks.append('<a href="'+tok+'">'+tok+'</a>')
+        else:
+            ret_toks.append(tok)
+    return ' '.join(ret_toks)
+
+def filterIdenticaTargetted(msg):
+    return (msg.find('@') == -1)
+
+def filterGitHubGHPages(msg):
+    return (msg.find('pushed to gh-pages at') == -1)
+
+def filters(msg):
+    return filterIdenticaTargetted(msg) and filterGitHubGHPages(msg)
+
 
 if __name__ == "__main__":
 
@@ -77,14 +104,22 @@ if __name__ == "__main__":
     if options.outfile == "-":
         out = sys.stdout
     else:
-        out   = tempfile.NamedTemporaryFile('w', prefix='ljpost_', dir='.', delete=False)
+        out = codecs.open(options.outfile, 'w', 'utf-8')
 
-    for line in outputGenerator("Recent Internet Activity", lotsaParsers(options)):
-        debug(line, True)
-        out.write(line)
+    out.write("<h2 class=\"blog\">Recent Activity</h2>\n")
+    for feed in FEEDS:
+        url = feed[0]
+        title = feed[1]
+        linkit = feed[2]
+        for line in outputGenerator(title, 
+                                    sorted(postGenerator(url.replace('USER', options.user), 
+                                                         options.number, 
+                                                         filter=filters), 
+                                           reverse=True),
+                                    linkit):
+            debug(line, True)
+            out.write(line)
 
     outname = out.name
     if outname != '<stdout>':
         out.close()
-        posix.chmod(outname, 0644)
-        posix.rename(outname, options.outfile)
