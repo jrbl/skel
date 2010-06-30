@@ -13,9 +13,9 @@ from datetime import datetime
 
 FEEDS = [
          #    URL                                    Label            Link it?
-         ("http://USER.livejournal.com/data/atom", "Blogging",        True), 
-         ("http://github.com/USER.atom",           "Developing",      True), 
-         ("https://identi.ca/api/statuses/user_timeline/USER.atom", 
+         ("http://USER.livejournal.com/data/atom", "Blogging",        True),
+         ("http://github.com/USER.atom",           "Developing",      True),
+         ("https://identi.ca/api/statuses/user_timeline/USER.atom",
                                                    "Tweeting",        False),
          ("http://api.flickr.com/services/feeds/photos_public.gne?id=17873302@N00&lang=en-us&format=atom",
                                                    "Photography",     True),
@@ -25,11 +25,11 @@ def configOptParse():
     parser = optparse.OptionParser(usage = "%prog [options] [-o outfile]")
     parser.add_option('-d', '--debug', dest="debug_flag", action="store_true", default=False,
                       help="Enable debug output.  Defaults to off")
-    parser.add_option('-n', '--number', dest="number", action="store", type="int", metavar="N", 
+    parser.add_option('-n', '--number', dest="number", action="store", type="int", metavar="N",
                       default=9, help="Get N most recent public LJ posts.  Defaults to 9")
     parser.add_option('-u', '--user', dest="user", action="store", metavar="USER", default='jrbl',
                       help="Substituted for USER into the resource URL.  Defaults to jrbl")
-    parser.add_option('-r', '--resource', dest="url", action="store", metavar="URL", 
+    parser.add_option('-r', '--resource', dest="url", action="store", metavar="URL",
                       default='http://USER.livejournal.com/data/atom',
                       help="Updates from URL (Token USER substituted for value of -u). Defaults to http://USER.livejournal.com/data/atom/")
     parser.add_option('-o', '--outfile', dest="outfile", action="store", metavar="FILE",
@@ -47,22 +47,21 @@ def getDebugFunc(flag):
     if flag: return _true
     else: return _false
 
-def postGenerator(url, max, filter = lambda x: x): 
-    count = 0 
+def postGenerator(url, max):
+    count = 0
     date = ''
     for post in feedparser.parse(url).entries:
         if count == max: break
-        if filter(post.title):
-            count += 1
-            try:
-                date = post.published[:19]
-            except AttributeError:
-                date = "%d-%02d-%02d %02d:%02d" % post.updated_parsed[0:5]
-            try:
-                title = post.title.decode('utf-8')
-            except UnicodeEncodeError:
-                title = post.title
-            yield date, title, post.link
+        count += 1
+        try:
+            date = post.published[:19]
+        except AttributeError:
+            date = "%d-%02d-%02d %02d:%02d" % post.updated_parsed[0:5]
+        try:
+            title = post.title.decode('utf-8')
+        except UnicodeEncodeError:
+            title = post.title
+        yield date, title, post.link
 
 def outputGenerator(header, input, linkit=True):
     yield "<h3 class=\"blog\">%s</h3>\n <ul class=\"activity\">\n" % header
@@ -92,29 +91,34 @@ def filterGitHubGHPages(msg):
 def filters(msg):
     return filterIdenticaTargetted(msg) and filterGitHubGHPages(msg)
 
+def postFilter(filterFunc, postStream):
+    for post in postStream:
+        if filterFunc(post[1]):        # filters get applied to post titles
+            yield post
+
 
 if __name__ == "__main__":
 
-    parser, options, args = configOptParse()
+    opt_parser, opt_options, opt_args = configOptParse()
 
-    if (len(sys.argv) == 0) or (not options.outfile):
-        parser.print_help()
+    if (len(sys.argv) == 0) or (not opt_options.outfile):
+        opt_parser.print_help()
         sys.exit()
-    debug = getDebugFunc(options.debug_flag)
-    if options.outfile == "-":
+    debug = getDebugFunc(opt_options.debug_flag)
+    if opt_options.outfile == "-":
         out = sys.stdout
     else:
-        out = codecs.open(options.outfile, 'w', 'utf-8')
+        out = codecs.open(opt_options.outfile, 'w', 'utf-8')
 
     out.write("<h2 class=\"blog\">Recent Activity</h2>\n")
     for feed in FEEDS:
-        url = feed[0]
+        url = feed[0].replace('USER', opt_options.user)
         title = feed[1]
         linkit = feed[2]
-        for line in outputGenerator(title, 
-                                    sorted(postGenerator(url.replace('USER', options.user), 
-                                                         options.number, 
-                                                         filter=filters), 
+        for line in outputGenerator(title,
+                                    sorted(postFilter(filters,
+                                                      postGenerator(url,
+                                                                    opt_options.number)),
                                            reverse=True),
                                     linkit):
             debug(line, True)
