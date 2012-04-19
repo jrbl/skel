@@ -27,8 +27,10 @@ Dotfiles: note these have been renamed; move to your home directory and remove t
 
   _.vimrc                    - Possibly the most important thing in skel
   _.vim/
+    colors/
     plugin/
-      *                      - locally installed vim plugins
+    syntax/
+      javascript.vim         - the default coloration of javascript is *terrible*
     templates/
       *                      - various templates for use with Aristotle Pagaltiz's vim templates system
                                You have no idea how much I type :set ft=py

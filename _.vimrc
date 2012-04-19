@@ -2,7 +2,8 @@
 "
 " TODO:
 "   * Find some way to colorize tabs.
-"
+" To look up a particular setting, use, e.g.:
+" :help 'nocp'
 
 """""""""""""""""""""""""""
 " Feature settings
@@ -10,11 +11,13 @@
 
 " General
 set nocp               " No compatability for VI
+set mouse=a            " I'm generally in xterm; XXX: wrap in if for terminal
 set aw                 " autowrite (ie auto save)
 set patchmode=.orig    " Keep 1st version of files around
 set backup             " Always make backup files
 
 " Display
+set nu                 " line numbers down the left side
 set ruler              " Show (row,col) 
 set scrolloff=3        " We keep 3 lines when scrolling  
 set showcmd            " Show command in status line
@@ -23,7 +26,6 @@ set title              " display vim info in window titlebar (in x)
 set icon               " display a mini-icon in our window (in x)
 set equalalways        " keep multiple buffers the same size
 set ead=both           " same size horiz. and vert.
-set nu                 " line numbering
 
 " Editing
 set hid                " When we open a new file, keep old ones around
@@ -33,25 +35,27 @@ set nowrap             " No line wrap
 " Syntax highlighting 
 set background=dark    " Makes colors brighter on dark terminals
 syntax on              " Make everything colorful and WONDERFUL!!
-filetype plugin on     " Special filetype processing (via vim or my own)
+colo evening           " a reasonable high-contrast, dark-background default
 
 " Searching commands
 set is                 " Incremental search
-set noignorecase       " Don't ignore case when searching
 set magic              " Makes pattern syntax a little more intuitive
 set hls                " Turns on highlighting while searching
+"set noignorecase       " Don't ignore case when searching
+set ignorecase         " Ignore case when searching, but...
+set smartcase          " actually pay attention to case when pattern has it
 
 " Programming
 set sm                 " Show matching ()'s []'s {}'s
 set ai                 " Autoindents
-set cin                " Autoindents C code
+"set cin                " Autoindents C code (see manual for config options)
 set tabstop=4          " Tabs are 4 spaces long
 set shiftwidth=4       " autoindent tabs are 4 spaces too
 set et                 " Tabs are converted to space characters
 set diffopt=iwhite     " whitespace-insensitive vdiffs
 
 """""""""""""""""""""""""""
-" Command Mappings
+" Keystroke Mappings
 """""""""""""""""""""""""""
 
 " Make tilde an operator like d, y or c
@@ -60,73 +64,118 @@ set top
 "Make Y = y$ not yy.  More intuative
 noremap Y y$
 
-" Spell Checking with aspell
-" Obsolete.  See :help for vim's builtin spelling checker.
-map _s :w!<CR>:!aspell check %<CR>:e! %<CR>
-
-" Word counts
-" I'd be surprised if this weren't obsolete too.  Even if it's not, it
-" would be better expressed as a macro.
-map _w :w!<CR>:!wc %<CR>
-
 " Pass the word under the pointer to dict.org's 'dict' client
 map _d "zyawnmz:read !dict z<CR>`z5dd
 
 " Pass the word under the pointer to uchicago's ARTFL Roget's Thesaurus (1911)
-map _t "zyawnmz:read !lynx -dump -hiddenlinks=ignore -nolist -nolog -nopause -noredir -nostatus http://machaut.uchicago.edu/cgi-bin/ROGET.sh?word=z<CR>`z12dd
+" XXX: Disabled.  Buggy performance or possibly completely broken.
+"map _t "zyawnmz:read !lynx -dump -hiddenlinks=ignore -nolist -nolog -nopause -noredir -nostatus http://machaut.uchicago.edu/cgi-bin/ROGET.sh?word=z<CR>`z12dd
+
+" Spell Checking with aspell
+" XXX: Obsolete.  See *.txt autocommands below
+"map _s :w!<CR>:!aspell check %<CR>:e! %<CR>
+
+" Word counts
+" XXX: Obsolete.  Use: g^g
+" map _w :w!<CR>:!wc %<CR>
 
 " re-indent the current file, and re-read it
-map _i :w!<CR>:!indent %<CR>:e! %<CR>
+" XXX: Obsolete.  Use: =G
+"map _i :w!<CR>:!indent %<CR>:e! %<CR>
 
 " Get svn diffs for against the current buffer.  see also
 " http://www.vim.org/tips/tip.php?tip_id=1282
-map _v :new<CR>:read !svn diff<CR>:set syntax=diff buftype=nofile<CR>gg
+" XXX: srsl?  Who uses svn any more?
+" map _v :new<CR>:read !svn diff<CR>:set syntax=diff buftype=nofile<CR>gg
 
 " Abbreviation mappings.  See chapter 24 in the manual.
 iab glinux GNU/Linux
 iab teh the
 
 """""""""""""""""""""""""""
+" Ex mode command definitions
+"""""""""""""""""""""""""""
+" Convenient command to see the difference between the current buffer and the
+" file it was loaded from, thus the changes you made.
+" Only define it when not defined already.
+if !exists(":DiffOrig")
+  command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
+		  \ | wincmd p | diffthis
+endif
+
+"""""""""""""""""""""""""""
 " Autocommand settings
 """""""""""""""""""""""""""
+" Only do the autocommand stuff if we're compiled with autocommand support.
+if has("autocmd")
 
-" Make comments be Light Cyan
-autocmd  BufReadPre * :hi Comment ctermfg=LightCyan
-"autocmd  BufReadPre * :hi Comment ctermfg=Gray
+  " Enable filetype detection
+  " Also load indent files, so we can do language-dependent indenting
+  filetype plugin indent on
 
-" When using mutt make the textwidth 76 cols;
-" also set some text-formatting options
-autocmd BufRead  mutt*[0-9]             set tw=76
-autocmd BufRead  mutt*[0-9]             set noautoindent
-autocmd BufRead  mutt*[0-9]             set nocindent
-autocmd BufRead  mutt*[0-9]             set ignorecase
-autocmd BufRead  pico*[0-9]             set tw=76
-autocmd BufRead  pico*[0-9]             set noautoindent
-autocmd BufRead  pico*[0-9]             set nocindent
-autocmd BufRead  mutt*[0-9]             set ignorecase
+  " Declare  autocmd group so we can enable/disable these directives together
+  augroup vimrcJoeAuto
+  au!
 
-" Text files have a text width of 78 characters
-""":set wrap linebreak textwidth=0
-autocmd BufNewFile *.txt                set tw=78 noai nocindent 
-autocmd BufRead    *.txt                set tw=78 noai nocindent 
+    " When editing a file, always jump to the last known cursor position.
+    " Don't do it when the position is invalid or when inside an event handler
+    " (happens when dropping a file on gvim).
+    " Also don't do it when the mark is in the first line, that is the default
+    " position when opening a file.
+    autocmd BufReadPost *
+      \ if line("'\"") > 1 && line("'\"") <= line("$") |
+      \   exe "normal! g`\"" |
+      \ endif
 
-" Tex files are like text files, but for tex
-""":set wrap linebreak textwidth=0
-autocmd BufNewFile *.tex                set tw=78 noai nocindent 
-autocmd BufRead    *.tex                set tw=78 noai nocindent 
+    " Text files have a text width of 79 characters
+    autocmd BufNewFile *.txt  setlocal tw=79 noai nocindent nonu
+    autocmd BufRead    *.txt  setlocal tw=79 noai nocindent nonu
+    autocmd BufEnter   *.txt  setlocal spell spelllang=en_us
+    autocmd BufLeave   *.txt  setlocal nospell 
+    
+    " Email files for Thunderbird's 'external editor' plugin
+    autocmd BufNewFile *.eml  setlocal tw=72 noai nocindent nonu
+    autocmd BufRead    *.eml  setlocal tw=72 noai nocindent nonu
+    autocmd BufEnter   *.eml  setlocal spell spelllang=en_us
+    autocmd BufLeave   *.eml  setlocal nospell 
+    " Email files for Evolutions's 'external editor' plugin
+    autocmd BufNewFile /tmp/evo[0-9a-zA-Z]* setlocal tw=72 noai nocindent nonu
+    autocmd BufRead /tmp/evo[0-9a-zA-Z]* setlocal tw=72 noai nocindent nonu
+    autocmd BufEnter /tmp/evo[0-9a-zA-Z]* setlocal spell spelllang=en_us
+    autocmd BufLeave /tmp/evo[0-9a-zA-Z]* setlocal nospell 
+    
+    " Tex files are like text files, but for tex instead of text
+    autocmd BufNewFile *.tex  setlocal tw=79 noai nocindent nonu
+    autocmd BufRead    *.tex  setlocal tw=79 noai nocindent nonu
+    
+    " Free Writing Exercises are mostly, but not entirely, like text files
+    autocmd BufNewFile *.fwe  setlocal tw=79 noai nocindent nonu
+    autocmd BufRead    *.fwe  setlocal tw=79 noai nocindent nonu
+    autocmd BufRead    *.fwe  G
+    
+    " Correctly indent VCS commit messages
+    autocmd BufNewFile svn-commit.tmp   setlocal tw=79 nocindent noai nonu
+    autocmd BufNewFile COMMIT_EDITMSG   setlocal tw=79 nocindent noai nonu
+    
+    " Automatically chmod +x Shell & Perl
+    autocmd BufWritePre   *.sh,*.pl,*.plx   setlocal ar 
+    autocmd BufWritePost  *.sh,*.pl,*.plx   !chmod u+x %
+    autocmd BufWritePost  *.sh,*.pl,*.plx   set ar<
+    
+  augroup END " vimrcJoeAuto
 
-" Free Writing Exercises are mostly, but not entirely, like text files
-""":set wrap linebreak textwidth=0
-autocmd BufNewFile *.fwe     set tw=78 noai nocindent 
-autocmd BufRead    *.fwe     set tw=78 noai nocindent 
-autocmd BufRead    *.fwe     G
+else
 
-" Correctly indent Subversion commit messages
-autocmd BufNewFile svn-commit.tmp       set tw=78 nocindent noai
+  " I don't have anything particular for when we don't have autocmd,
+  " there's so much awesome in the configuration up above. :)
 
-" Automatically chmod +x Shell, Perl, and Python scripts
-autocmd BufWritePost   *.sh             !chmod u+x %
-autocmd BufWritePost   *.pl             !chmod u+x %
-autocmd BufWritePost   *.plx            !chmod u+x %
-autocmd BufWritePost   *.py             !chmod u+x %
+endif " has("autocmd")
+
+" Make vim chdir to the directory of the file we're editing; 
+" XXX: may break some plugins
+if exists('+autochdir')
+    set autochdir
+else
+    autocmd BufEnter * silent! lcd %:p:h:gs/ /\\ /
+endif
 
