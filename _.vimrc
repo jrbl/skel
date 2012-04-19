@@ -53,6 +53,13 @@ set diffopt=iwhite     " whitespace-insensitive vdiffs
 """""""""""""""""""""""""""
 " Command Mappings
 """""""""""""""""""""""""""
+
+" Make tilde an operator like d, y or c
+set top                
+
+"Make Y = y$ not yy.  More intuative
+noremap Y y$
+
 " Spell Checking with aspell
 " Obsolete.  See :help for vim's builtin spelling checker.
 map _s :w!<CR>:!aspell check %<CR>:e! %<CR>

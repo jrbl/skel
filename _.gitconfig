@@ -1,0 +1,26 @@
+[user]
+	name = Joe Blaylock
+	email = jrbl@slac.stanford.edu
+
+
+[color] 
+    ui = auto
+    branch = auto
+    diff = auto
+    status = auto
+    interactive = auto
+
+[alias]
+    ; makes a pretty branch tree on color terminals (thanks to Henning Weiler)
+    k = log --graph --decorate --pretty=oneline --abbrev-commit
+    ; shows all the branches sorted by date (most recent last) and shows dates
+    ; except it's broken. XXX - diagnose
+    ; d = for-each-ref --format="%(committerdate:short): %(refname)" --sort=committerdate refs/heads/
+
+[merge]
+    tool = opendiff
+[diff]
+    external = git_diff_wrapper
+[pager]
+    diff =
+

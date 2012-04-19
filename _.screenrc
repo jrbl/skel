@@ -19,6 +19,9 @@ shell /bin/bash
 # SCREEN KEYBINDINGS
 # ------------------------------------------------------------------------------
 
+# Rebind command key to ^t because ^a is just annoying
+escape ^Tt
+
 # Remove bindings for xon/xoff; I never use them anyway
 bind '^S'
 bind '^Q'

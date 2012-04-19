@@ -1,0 +1,3 @@
+#!/bin/sh
+#vimdiff "$2" "$5"
+vimdiff -c 'set diffopt+=iwhite' "$2" "$5"

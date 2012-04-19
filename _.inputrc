@@ -1,0 +1,31 @@
+# Make my shell (and lots of other things) work CORRECTLY. :-)
+set bell-style visible
+
+# remap ? and / for command mode
+set keymap vi-command
+Control-r: vi-redo
+?:reverse-search-history
+/: forward-search-history
+
+# remap ? and / for insert mode (to do themselves)
+set keymap vi-insert
+?:self-insert
+/:self-insert
+Control-r: vi-redo
+
+###############################
+## keystroke bindings, because they're sort of like aliases
+################################
+## history search with ? and /
+#bind -m vi-command -r '\C-r'
+#bind -m vi-command -r '\C-s'
+#bind -m vi-command '?':reverse-search-history
+#bind -m vi-command '/':forward-search-history 
+#bind -m vi-insert '?':self-insert
+#bind -m vi-insert '/':self-insert
+## make C-r redo like in vim
+#bind -m vi-insert '\C-r':vi-redo
+#bind -m vi-command '\C-r':vi-redo
+
+# Should always be the last thing run
+set editing-mode vi
