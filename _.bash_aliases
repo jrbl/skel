@@ -61,6 +61,8 @@ function q() {
 #    perl -e'$env=$ENV{HOME}; $pwd=$ENV{PWD}; chomp($pwd); $pwd =~ s/$env/~/; if(length($pwd) > 30) { @dirs = split(/\//, $pwd); print "$dirs[0]/$dirs[1]/.../$dirs[-2]/$dirs[-1]/"} else { print $pwd; }'
 #}
 
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
+
 # more ls aliases
 alias ll='ls -alF'
 alias la='ls -A'

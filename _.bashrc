@@ -115,7 +115,7 @@ shopt -s autocd
 # Random other variables I want set for different programs
 export EDITOR="vim"
 export EMAIL="Joe Blaylock <jrbl@jrbl.org>"
-export PATH=$HOME/bin:$PATH
+export PATH=$HOME/bin:$PATH:$HOME/.rvm/bin
 # make sure UTF-8 is set up correctly in most linuxes
 LANG=en_US.UTF-8
 LC_ALL=en_US.UTF-8
