@@ -30,6 +30,12 @@ bind 'q'
 
 #bind 'R' colon "screen -ln rlogin faui -8^b^b^b"
 bind 'P' colon "^p"
+bind x       # unbind
+bind ^X      # unbind
+bind X       # unbind
+bind X remove
+bind - split
+#bind | vsplit
 
 # An example of a "screen scraper" which will launch urlview on the current
 # screen window

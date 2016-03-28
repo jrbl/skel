@@ -32,27 +32,35 @@ set hid                " When we open a new file, keep old ones around
 set backspace=2        " Makes backspace DTRT in Insert mode
 set nowrap             " No line wrap
 
-" Syntax highlighting 
-set background=dark    " Makes colors brighter on dark terminals
+" Syntax highlighting and other flashy stuff
 syntax on              " Make everything colorful and WONDERFUL!!
-colo evening           " a reasonable high-contrast, dark-background default
+set background=dark    " Makes colors brighter on dark terminals
+if has("gui_running")
+  colo railscasts       " trying something more new
+  set gfn=Inconsolata\ Medium\ 10 " Custom font for gvim session
+else
+  "set background=dark    " Makes colors brighter on dark terminals
+  "colo delek             " a reasonable high-contrast, dark-background default
+  colo koehler
+  hi Normal ctermbg=NONE " even with evening colors; we make it transparent
+  "colo transparent       " trying something new
+endif
 
 " Searching commands
 set is                 " Incremental search
 set magic              " Makes pattern syntax a little more intuitive
 set hls                " Turns on highlighting while searching
-"set noignorecase       " Don't ignore case when searching
 set ignorecase         " Ignore case when searching, but...
 set smartcase          " actually pay attention to case when pattern has it
 
 " Programming
 set sm                 " Show matching ()'s []'s {}'s
 set ai                 " Autoindents
-"set cin                " Autoindents C code (see manual for config options)
 set tabstop=4          " Tabs are 4 spaces long
 set shiftwidth=4       " autoindent tabs are 4 spaces too
 set et                 " Tabs are converted to space characters
 set diffopt=iwhite     " whitespace-insensitive vdiffs
+"set cin                " Autoindents C code (see manual for config options)
 
 """""""""""""""""""""""""""
 " Keystroke Mappings
@@ -61,18 +69,30 @@ set diffopt=iwhite     " whitespace-insensitive vdiffs
 " Make tilde an operator like d, y or c
 set top                
 
-"Make Y = y$ not yy.  More intuative
+"Make Y = y$ not yy.  More intuitive
 noremap Y y$
 
 " Pass the word under the pointer to dict.org's 'dict' client
 map _d "zyawnmz:read !dict z<CR>`z5dd
+
+" Toggle taglist on and off with a keystroke
+map _T :TlistToggle<CR>
+
+" Toggle ConqueTerm on and off with a keystroke
+"map _t :ConqueTerm bash<CR>
+"map _t :ConqueTermVSplit bash --login<CR>
+map _t :ConqueTermSplit bash --login<CR>
+map _tt :tabe +ConqueTerm\ bash\ --login<CR>
+map _x :call conque_term#exec_file()<CR>
+let g:ConqueTerm_ReadUnfocused = 1
+"let g:ConqueTerm_EscKey = '<C-a>' " XXX: better option?
 
 " Pass the word under the pointer to uchicago's ARTFL Roget's Thesaurus (1911)
 " XXX: Disabled.  Buggy performance or possibly completely broken.
 "map _t "zyawnmz:read !lynx -dump -hiddenlinks=ignore -nolist -nolog -nopause -noredir -nostatus http://machaut.uchicago.edu/cgi-bin/ROGET.sh?word=z<CR>`z12dd
 
 " Spell Checking with aspell
-" XXX: Obsolete.  See *.txt autocommands below
+" XXX: Obsolete.  See :help spell 
 "map _s :w!<CR>:!aspell check %<CR>:e! %<CR>
 
 " Word counts
@@ -127,6 +147,10 @@ if has("autocmd")
       \   exe "normal! g`\"" |
       \ endif
 
+    " Let's try to set up auto-folding of python files
+    autocmd BufEnter *.py setlocal foldnestmax=2 foldmethod=indent
+    autocmd BufLeave *.py setlocal foldnestmax=20 foldmethod=manual
+
     " Text files have a text width of 79 characters
     autocmd BufNewFile *.txt  setlocal tw=79 noai nocindent nonu
     autocmd BufRead    *.txt  setlocal tw=79 noai nocindent nonu
@@ -171,11 +195,11 @@ else
 
 endif " has("autocmd")
 
-" Make vim chdir to the directory of the file we're editing; 
-" XXX: may break some plugins
-if exists('+autochdir')
-    set autochdir
-else
-    autocmd BufEnter * silent! lcd %:p:h:gs/ /\\ /
-endif
+"" Make vim chdir to the directory of the file we're editing; 
+"" XXX: may break some plugins
+"if exists('+autochdir')
+"    set autochdir
+"else
+"    autocmd BufEnter * silent! lcd %:p:h:gs/ /\\ /
+"endif
 

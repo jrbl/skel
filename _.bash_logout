@@ -1,1 +1,2 @@
+history -a
 clear

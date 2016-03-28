@@ -1,0 +1,2 @@
+#!/bin/sh
+xclock -digital -brief -twentyfour -fg white -bg black -name jclock &

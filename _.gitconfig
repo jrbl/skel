@@ -1,7 +1,6 @@
 [user]
 	name = Joe Blaylock
-	email = jrbl@slac.stanford.edu
-
+	email = my_email_address
 
 [color] 
     ui = auto
@@ -11,16 +10,46 @@
     interactive = auto
 
 [alias]
+    ; s is status, but shorter
+    #s = status -b -s
+    s = ! echo "$(git status -b -s) $(git log -1 --pretty --oneline)" | fold -s
+    ; co = checkout is pretty common
+    co = checkout
+    ; cor = checkout recent (local) - gets most recently modified local branch
+    cor = ! git checkout `git for-each-ref --format='%(refname:short)' --sort=-committerdate --count=1 refs/heads` && git status -b -s
     ; makes a pretty branch tree on color terminals (thanks to Henning Weiler)
     k = log --graph --decorate --pretty=oneline --abbrev-commit
-    ; shows all the branches sorted by date (most recent last) and shows dates
-    ; except it's broken. XXX - diagnose
-    ; d = for-each-ref --format="%(committerdate:short): %(refname)" --sort=committerdate refs/heads/
+    dno = diff --name-only
+    ; if you're in the middle of a merge with conflicts and want to see 
+    ;   without lines changed
+    ; conflicts = !git ls-files -u | cut -f 2 | sort -u
+    ;   with lines changed
+    conflicts = !git diff --no-ext-diff --stat | head -1 | sort
+    ; d (dir) shows the most recent branches, locally only
+    d = !git for-each-ref --format='%(committerdate:short): %(refname:short)' --sort=committerdate refs/heads | tail -5
+    ; dr (dir w/ remotes) shows the most recent branches, including remotes
+    dr = !git for-each-ref --format='%(committerdate:short): %(refname:short)' --sort=committerdate refs | tail -5
+    ; tld shows every branch (too-long-dir) locally only
+    tld = for-each-ref --format='%(committerdate:short): %(refname:short)' --sort=committerdate refs/heads
+    ; tldr shows every branch both local and remote (too-long-dir w/ remotes)
+    tldr = for-each-ref --format='%(committerdate:short): %(refname:short)' --sort=committerdate refs
 
-[merge]
-    tool = opendiff
+#[merge]
+#    tool = gvimdiff
+#    external = meld
+#    tool = opendiff
+
 [diff]
+#    tool = gvimdiff
     external = git_diff_wrapper
+#    external = meld
+
 [pager]
     diff =
 
+[github]
+	user = my_github_username
+[ghi]
+	token = my_github_api_token
+[push]
+	default = current

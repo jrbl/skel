@@ -43,11 +43,29 @@ case "$TERM" in
     *) color_prompt= ;;
 esac
 
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto --group-directories-first'
+    alias ll='ls -l'
+    alias psa="ps -A -o pid,user,nice,%cpu,%mem,args --forest"
+    #alias dir='ls --color=auto --format=vertical'
+    #alias vdir='ls --color=auto --format=long'
+    #alias termsize="stty -a | head -1 | cut -d';' -f2,3 | sed -e 's/\(.*\) \([0-9]*\);\(.*\) \([0-9]*\)/\1=\2;\3=\4;/'"
+    alias termsize="stty -a | head -1 | cut -d';' -f2,3 | sed -e 's/\(.*\) \([0-9]*\);\(.*\) \([0-9]*\)/\4x\2/'"
+
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+# save termsize (above) into variable for more efficient PROMPT_COMMAND building
+TERMSIZE=`termsize`
+
 # uncomment for a colored prompt, if the terminal has the capability; turned
 # off by default to not distract the user: the focus in a terminal window
 # should be on the output of commands, not on the prompt
 #force_color_prompt=yes
-
 if [ -n "$force_color_prompt" ]; then
     if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
 	# We have color support; assume it's compliant with Ecma-48
@@ -62,41 +80,31 @@ fi
 if [ "$color_prompt" = yes ]; then
     #PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
     #PS1='\[\033[01;32m\]$(__git_ps1 "(%s)")\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
-    PS1='\[\033[0;32m\]:$(__git_ps1 "%s"):\$\[\033[00m\] '
-    #PS1='\$ '
+    #PS1='\[\033[0;32m\] $(__git_ps1 "%s") \$\[\033[00m\] '
+    #####PS1='$(__git_ps1 "%s") \w \$ '
+    PS1='\$ '
 else
     #PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
     #PS1="\[\033[0;35m\]\h\[\033[0m\] \`pathfrob\` \$ " # Cf. .bash_aliases file
     #PS1='$(__git_ps1 "(%s")):\w\$ '
-    PS1='$(__git_ps1 "%s"):\w\$ '
-    #PS1='\$ '
+    #####PS1='$(__git_ps1 "%s") \w \$ '
+    PS1='\$ '
 fi
 unset color_prompt force_color_prompt
 
 # If this is an xterm set the title to user@host:dir
 case "$TERM" in
-xterm*|rxvt*)
+xterm*|rxvt*|screen)
     #PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD}\007"'
-    PROMPT_COMMAND='echo -ne "\033]0; $?    `date +%H:%M`     ${USER}@${HOSTNAME}:${PWD}\007"'
+    #PROMPT_COMMAND='echo -ne "\033]0; $?    `date +%H:%M`     ${USER}@${HOSTNAME}:${PWD}\007"'
+    #PROMPT_COMMAND='echo -ne "\033]0; $?    `date +%H:%M`     ${USER}@${HOSTNAME}:${PWD}     ${TERMSIZE}\007"'
+    PROMPT_COMMAND='echo -ne "\033]0;$?:${USER}@${HOSTNAME}:${PWD}\007"'
+    #PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
     #PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
     ;;
 *)
     ;;
 esac
-
-# enable color support of ls and also add handy aliases
-if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    alias ll='ls -l'
-    alias psa="ps -A -o pid,user,nice,%cpu,%mem,args --forest"
-    #alias dir='ls --color=auto --format=vertical'
-    #alias vdir='ls --color=auto --format=long'
-
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
-fi
 
 # Alias definitions.
 if [ -f ~/.bash_aliases ]; then
@@ -121,3 +129,12 @@ LANG=en_US.UTF-8
 LC_ALL=en_US.UTF-8
 export LANG LC_ALL
 #NETHACKOPTIONS='color,DECgraphics,lit_corridor,mail,news,number_pad,rest_on_space,safe_pet,sortpack,!autopickup'
+
+#export VIRTUALENV_DISTRIBUTE=true # XXX - commented out 20140129, what did this do?
+# virtualenvwrapper setup
+export WORKON_HOME=~/Hacking/EnvsVirtualEnv
+export PROJECT_HOME=~/Hacking/ProjectsVirtualEnv
+export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python
+export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
+export VIRTUALENVWRAPPER_VIRTUALENV=/usr/local/bin/virtualenv
+source /usr/local/bin/virtualenvwrapper.sh

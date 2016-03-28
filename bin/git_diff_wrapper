@@ -1,3 +1,15 @@
 #!/bin/sh
-#vimdiff "$2" "$5"
-vimdiff -c 'set diffopt+=iwhite' "$2" "$5"
+#echo diffing for "$@"
+
+##if [ -n $VIRTUAL_ENV ]; then
+##    # If we're in a python virtual environment, try to show everything tabbed in one window per env
+##    SERVERNAME=`basename $VIRTUAL_ENV`
+##    #gvimdiff -c 'set diffopt+=iwhite,context:3' --servername $SERVERNAME -remote-tab-silent "$2" "$5"
+##    #gvimdiff -c 'set diffopt+=iwhite,context:3' --servername $SERVERNAME "$2" "$5"
+##    #gvimdiff -c 'set diffopt+=iwhite,context:3' "$2" "$5"
+##    vim -g -f -d -c 'set diffopt+=iwhite' "$2" "$5"
+##    # FIXME: broken b/c git diff cleans up tmp files before vim can load them? also servername and role break things
+##else
+##    # normal case, we just show side-by-side diffs
+    vimdiff -c 'set diffopt+=iwhite' "$2" "$5"
+##fi

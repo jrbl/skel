@@ -1,11 +1,6 @@
-A bunch of stuff that I normally like to have around, or that it isn't normal 
-for me to have, but which I thought others would find useful.
+A bunch of stuff that I like to have around. Below are notes about a few of them.
 ---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|
 bin/
-  TopLJPostPackager.py       - Used at jrbl.org to query my LiveJournal, gather up the most recent public posts, and 
-                               stick their permalinks into a file for server-side inclusion.  With minor enhancement,
-                               could be used to repackage any RSS or Atom feed.
-
   BaseChanger.py             - converts integers into string representations in arbitrary bases, and arbitrarily-based
                                strings (encoding numeric values) into regular integers.  Has convenience features for 
                                bases up to base-66, which is the highest base that can be supported in standard URLs.
@@ -15,20 +10,13 @@ bin/
                                it for 'git diff'.
 
 Dotfiles: note these have been renamed; move to your home directory and remove the leading _ to install.
-  _.bash_aliases             - shell functions and aliases I use every day
-  _.bash_logout              - clears screen on logout
-  _.bash_profile             - adjusts path and manpath and friends for /usr/local and ~/.user/
   _.bashrc                   - mostly just has colorful, wonderful prompts
-
   _.inputrc                  - configures keystrokes in all GNU readline-aware programs (bash, ipython, etc.)
-
   _.screenrc                 - contains comments explaining how to do screen sharing.  sort of.
-  _.tmux.conf                - terminal sharing is much easier in tmux, so recently I've switched to it
+  _.tmux.conf                - terminal sharing is much easier in tmux, so for years now I prefer it
 
   _.vimrc                    - Possibly the most important thing in skel
   _.vim/
-    colors/
-    plugin/
     syntax/
       javascript.vim         - the default coloration of javascript is *terrible*
     templates/
