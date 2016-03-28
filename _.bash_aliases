@@ -9,7 +9,32 @@ function git_diff() {
 }
 
 function gitr() {
-    git for-each-ref --format="%(committerdate:short): %(refname)" --sort=committerdate refs/remotes/$1; # show remote refs by date, for remote $1
+    git for-each-ref --format="%(committerdate:short): %(refname:short)" --sort=committerdate refs/remotes/$1; # show remote refs by date, for remote $1
+}
+
+function gitg() {
+    # git get gets files from a different tree-ish into this one
+    if [ $# -lt 2 ]; then
+        echo "gitg gets files from different git branches into this one"
+        echo "gitg TREEISH /path/to/treeish/file [/path/to/this/place]"
+        echo "if no target is specified, other version will be .lkg"
+    fi
+    if [ $# -lt 3 ]; then
+        target="$2".lkg;
+    else
+        target="$3";
+    fi
+    print_dark "fetching $2 from $1, writing to $target"
+    git show $1:$2 >"$target"
+}
+
+function gitwand() {
+    if [ $# -lt 1 ]; then
+        echo "give me a remote branch name"
+    fi
+    git log $1...master --oneline --color=never | grep -v "Merge branch 'master'" | sed '1!G;h;$!d' | sed 's/^/squash /' >/tmp/EDIT
+    echo "Bring in from /tmp/EDIT"; read
+    git rebase -i --no-ff master
 }
 
 function print_dark() {
@@ -91,11 +116,11 @@ alias pine="/usr/bin/mutt"
 alias more="/usr/bin/less"
 
 # Work related things for invenio
-alias kwalitee='python ~/Hacking/invenio/modules/miscutil/lib/kwalitee.py --check-some'
-alias gitd='git for-each-ref --format="%(committerdate:shortdate): %(refname)" --sort=committerdate refs/heads/'
+#alias kwalitee='python ~/Hacking/invenio/modules/miscutil/lib/kwalitee.py --check-some'
+#alias gitd='git for-each-ref --format="%(committerdate:shortdate): %(refname)" --sort=committerdate refs/heads/'
 #alias gitd='git for-each-ref --format="%(committerdate:short): %(refname)" --sort=committerdate refs/heads/' # old form
-alias diffkwal='for file in `git diff --name-only HEAD~1 | grep .py$ `; do echo $file; echo; if [ -f $file ]; then kwalitee $file; else echo "$file not found.  Skipping kwalitee check."; fi; echo; done'
-alias reload='make install && /opt/cds-invenio/bin/inveniocfg --update-all && sudo /etc/init.d/httpd restart'
+#alias diffkwal='for file in `git diff --name-only HEAD~1 | grep .py$ `; do echo $file; echo; if [ -f $file ]; then kwalitee $file; else echo "$file not found.  Skipping kwalitee check."; fi; echo; done'
+#alias reload='make install && /opt/cds-invenio/bin/inveniocfg --update-all && sudo /etc/init.d/httpd restart'
 # See also (defined above):
 # gitr()
 # git_diff()
